@@ -865,6 +865,21 @@ function gameLoop() {
   updateDisplay();
 }
 
+// ============ CHEAT LISTENER ============
+function checkCheats() {
+  const cheats = [
+    'maxcandies', 'unlockbuildings', 'unlockupgrades',
+    'autoclick', 'goldenspam', 'maxcps', 'reset'
+  ];
+  cheats.forEach(key => {
+    const val = localStorage.getItem('vandrex_candy_cheat_' + key);
+    if (val === 'true') {
+      localStorage.removeItem('vandrex_candy_cheat_' + key);
+      cheat(key);
+    }
+  });
+}
+
 // ============ INIT ============
 load();
 renderBuildings();
@@ -876,6 +891,7 @@ startGoldenTimer();
 setInterval(gameLoop, 50);
 setInterval(save, 30000);
 setInterval(() => { renderBuildings(); renderUpgrades(); }, 500);
+setInterval(checkCheats, 500);
 </script>
 </body>
 </html>
