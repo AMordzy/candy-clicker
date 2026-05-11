@@ -862,8 +862,20 @@ function cheat(type) {
       notify('⚡ Max CPS applied!');
       break;
     case 'reset':
-      if (confirm('Reset all progress? This cannot be undone!')) {
+      if (confirm('Reset ALL progress? This cannot be undone!')) {
         localStorage.removeItem('vandrex_candy');
+        localStorage.removeItem('vandrex_admin_unlocked');
+        // Reset all game state
+        candies = 0;
+        totalCandies = 0;
+        clickPower = 1;
+        cpsMultiplier = 1;
+        cps = 0;
+        boughtUpgrades = {};
+        buildings.forEach(b => { b.owned = 0; });
+        buildings.forEach(b => { buildingMultipliers[b.id] = 1; });
+        if (autoClickInterval) { clearInterval(autoClickInterval); autoClickInterval = null; }
+        if (goldenSpamInterval) { clearInterval(goldenSpamInterval); goldenSpamInterval = null; }
         location.reload();
       }
       break;
