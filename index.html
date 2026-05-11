@@ -788,13 +788,32 @@ function toggleAdmin() {
 }
 
 function showAdminIfNeeded() {
-  try {
-    const user = JSON.parse(localStorage.getItem('vandrex_user') || '{}');
-    if (user.email === 'aaron.mordey@outlook.com') {
-      document.getElementById('admin-panel').style.display = 'block';
-    }
-  } catch(e) {}
+  if (localStorage.getItem('vandrex_admin_unlocked') === 'true') {
+    document.getElementById('admin-panel').style.display = 'block';
+  }
 }
+
+function unlockAdmin() {
+  const pw = prompt('⚡ Enter admin password:');
+  if (pw === 'V@ndr3x#Esp0rts99') {
+    localStorage.setItem('vandrex_admin_unlocked', 'true');
+    document.getElementById('admin-panel').style.display = 'block';
+    notify('⚡ Admin mode unlocked!');
+  } else if (pw !== null) {
+    notify('❌ Wrong password!');
+  }
+}
+
+// Type "aaron" anywhere to trigger admin unlock
+let typedBuffer = '';
+document.addEventListener('keydown', (e) => {
+  typedBuffer += e.key.toLowerCase();
+  if (typedBuffer.length > 10) typedBuffer = typedBuffer.slice(-10);
+  if (typedBuffer.includes('aaron')) {
+    typedBuffer = '';
+    unlockAdmin();
+  }
+});
 
 function cheat(type) {
   switch(type) {
