@@ -459,9 +459,12 @@ function doRebirth(){
   const o=document.getElementById('rebirth-overlay');
   document.getElementById('rb-anim-emoji').textContent=nextE;
   document.getElementById('rb-overlay-text').textContent='Earned +'+rew+' Sugar! Your candy evolves to '+nextE;
+  pauseLoop=true;
+  C=0;TC=0;
   o.style.display='flex';
   setTimeout(()=>{
     o.style.display='none';
+    pauseLoop=false;
     RB++;sugar+=rew;totalSugar+=rew;spins++;spins+=(PL.p6||0);
     C=0;TC=0;CP=1;CM=1;BU={};
 
@@ -580,6 +583,8 @@ function showSpecial(emoji,title,desc){
   document.getElementById('special-emoji').textContent=emoji;
   document.getElementById('special-title').textContent=title;
   document.getElementById('special-desc').textContent=desc;
+  pauseLoop=true;
+  C=0;TC=0;
   o.style.display='flex';
   const cf=['🍬','🍭','⭐','✨','🌟','💎','🎉'];
   for(let i=0;i<20;i++){
@@ -646,7 +651,13 @@ function cheat(t){
     case 'forcerebirth':TC=getRBReq()+1;doRebirth();break;
     case 'reset':
       if(confirm('Reset EVERYTHING? Cannot be undone!')){
-        localStorage.removeItem('vandrex_candy');localStorage.removeItem('vandrex_admin_unlocked');location.reload();
+        // Stop all intervals first so save cant run
+        for(let i=1;i<99999;i++){clearInterval(i);clearTimeout(i);}
+        // Wipe storage completely
+        localStorage.clear();
+        sessionStorage.clear();
+        // Hard reload with cache bust
+        location.href=location.href.split('?')[0]+'?reset='+Date.now();
       }break;
   }
   renderBuildings();renderUpgrades();renderRebirth();renderPerm();updateDisplay();save();
@@ -675,7 +686,9 @@ function load(){
   }catch(e){console.log('Load err',e);}
 }
 
+let pauseLoop=false;
 function gameLoop(){
+  if(pauseLoop)return;
   if(CPS>0){const e=CPS/20;C+=e;TC+=e;if(TC>bestC)bestC=TC;}
   updateDisplay();
 }
