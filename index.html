@@ -6,923 +6,684 @@
 <title>Vandrex Candy Clicker</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap');
-
-  :root {
-    --bg: #0a0a0f;
-    --panel: #12121a;
-    --border: #2a2a3a;
-    --accent: #ff6b35;
-    --accent2: #ffcc00;
-    --text: #e0e0f0;
-    --muted: #666680;
-    --success: #00ff88;
-    --candy: #ff4488;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* TOP BAR */
-  #topbar {
-    background: var(--panel);
-    border-bottom: 2px solid var(--accent);
-    padding: 8px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-  }
-
-  #topbar h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
-    color: var(--accent);
-    letter-spacing: 2px;
-  }
-
-  #candy-count {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 18px;
-    color: var(--accent2);
-    text-align: center;
-  }
-
-  #candy-count span {
-    font-size: 12px;
-    color: var(--muted);
-    display: block;
-  }
-
-  #cps-display {
-    font-size: 13px;
-    color: var(--success);
-    text-align: right;
-  }
-
-  /* MAIN LAYOUT */
-  #game {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  /* LEFT - CLICK ZONE */
-  #click-zone {
-    flex: 0 0 280px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(ellipse at center, #1a0a1a 0%, var(--bg) 70%);
-    border-right: 1px solid var(--border);
-    position: relative;
-    overflow: hidden;
-  }
-
-  #click-zone::before {
-    content: '';
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,68,136,0.05) 0%, transparent 70%);
-    animation: pulse 3s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.5; }
-    50% { transform: scale(1.2); opacity: 1; }
-  }
-
-  #candy-btn {
-    width: 160px;
-    height: 160px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #ff88cc, #ff2266, #cc0044);
-    border: 4px solid rgba(255,255,255,0.2);
-    cursor: pointer;
-    transition: transform 0.05s;
-    box-shadow: 0 0 40px rgba(255,68,136,0.4), 0 0 80px rgba(255,68,136,0.2);
-    position: relative;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 70px;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-
-  #candy-btn:active {
-    transform: scale(0.93);
-    box-shadow: 0 0 20px rgba(255,68,136,0.6);
-  }
-
-  #candy-btn:hover {
-    box-shadow: 0 0 60px rgba(255,68,136,0.6), 0 0 120px rgba(255,68,136,0.3);
-  }
-
-  #click-label {
-    margin-top: 16px;
-    font-size: 12px;
-    color: var(--muted);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
-  #click-power {
-    margin-top: 6px;
-    font-size: 13px;
-    color: var(--candy);
-  }
-
-  /* FLOATING CLICK NUMBERS */
-  .click-float {
-    position: fixed;
-    pointer-events: none;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--accent2);
-    text-shadow: 0 0 10px rgba(255,204,0,0.8);
-    animation: floatUp 1s ease-out forwards;
-    z-index: 9999;
-  }
-
-  @keyframes floatUp {
-    0% { opacity: 1; transform: translateY(0) scale(1); }
-    100% { opacity: 0; transform: translateY(-80px) scale(0.6); }
-  }
-
-  /* GOLDEN CANDY */
-  #golden-candy {
-    position: absolute;
-    font-size: 40px;
-    cursor: pointer;
-    animation: goldenFloat 3s ease-in-out infinite, goldenGlow 1s ease-in-out infinite alternate;
-    z-index: 10;
-    display: none;
-    filter: drop-shadow(0 0 10px gold);
-  }
-
-  @keyframes goldenFloat {
-    0%, 100% { transform: translateY(0) rotate(-10deg); }
-    50% { transform: translateY(-15px) rotate(10deg); }
-  }
-
-  @keyframes goldenGlow {
-    from { filter: drop-shadow(0 0 5px gold); }
-    to { filter: drop-shadow(0 0 20px gold) drop-shadow(0 0 40px orange); }
-  }
-
-  /* MIDDLE - UPGRADES */
-  #upgrades-panel {
-    flex: 0 0 180px;
-    background: var(--panel);
-    border-right: 1px solid var(--border);
-    overflow-y: auto;
-    padding: 10px;
-  }
-
-  #upgrades-panel h3 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 10px;
-    color: var(--accent);
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 6px;
-  }
-
-  .upgrade-item {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 8px;
-    margin-bottom: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    opacity: 0.4;
-    pointer-events: none;
-  }
-
-  .upgrade-item.available {
-    opacity: 1;
-    pointer-events: all;
-    border-color: var(--accent2);
-    box-shadow: 0 0 8px rgba(255,204,0,0.2);
-  }
-
-  .upgrade-item.available:hover {
-    background: rgba(255,204,0,0.1);
-    transform: translateX(2px);
-  }
-
-  .upgrade-item.bought {
-    opacity: 0.3;
-    pointer-events: none;
-    border-color: var(--success);
-  }
-
-  .upgrade-name {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--accent2);
-  }
-
-  .upgrade-desc {
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 2px;
-  }
-
-  .upgrade-cost {
-    font-size: 11px;
-    color: var(--candy);
-    margin-top: 3px;
-  }
-
-  /* RIGHT - SHOP */
-  #shop {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-    background: var(--bg);
-  }
-
-  #shop h3 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 10px;
-    color: var(--accent);
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 6px;
-    position: sticky;
-    top: 0;
-    background: var(--bg);
-    z-index: 5;
-  }
-
-  .building-item {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 12px;
-    margin-bottom: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .building-item:hover:not(.locked) {
-    border-color: var(--accent);
-    background: rgba(255,107,53,0.1);
-    transform: translateX(3px);
-  }
-
-  .building-item.locked {
-    opacity: 0.3;
-    cursor: not-allowed;
-  }
-
-  .building-item.affordable {
-    border-color: var(--accent2);
-    box-shadow: 0 0 10px rgba(255,204,0,0.15);
-  }
-
-  .building-icon {
-    font-size: 28px;
-    flex-shrink: 0;
-    width: 36px;
-    text-align: center;
-  }
-
-  .building-info {
-    flex: 1;
-  }
-
-  .building-name {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .building-desc {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 1px;
-  }
-
-  .building-cps {
-    font-size: 11px;
-    color: var(--success);
-    margin-top: 1px;
-  }
-
-  .building-right {
-    text-align: right;
-    flex-shrink: 0;
-  }
-
-  .building-cost {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 12px;
-    color: var(--accent2);
-  }
-
-  .building-owned {
-    font-size: 22px;
-    font-weight: 900;
-    color: var(--accent);
-    font-family: 'Orbitron', sans-serif;
-  }
-
-  /* SCROLLBAR */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  /* NOTIFICATION */
-  #notification {
-    position: fixed;
-    top: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--panel);
-    border: 1px solid var(--accent2);
-    color: var(--accent2);
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 12px;
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
-    box-shadow: 0 0 20px rgba(255,204,0,0.3);
-  }
-
-  /* ADMIN PANEL */
-  #admin-panel {
-    position: fixed;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #0d0d15;
-    border: 2px solid var(--accent);
-    border-left: none;
-    border-radius: 0 12px 12px 0;
-    z-index: 9998;
-    width: 180px;
-    transition: transform 0.3s;
-    display: none;
-  }
-
-  #admin-panel.minimised {
-    transform: translateY(-50%) translateX(-155px);
-  }
-
-  #admin-header {
-    background: var(--accent);
-    padding: 8px 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-radius: 0 10px 0 0;
-  }
-
-  #admin-header span {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 9px;
-    color: #000;
-    font-weight: 900;
-    letter-spacing: 1px;
-  }
-
-  #admin-toggle {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    color: #000;
-    font-weight: 900;
-    line-height: 1;
-  }
-
-  #admin-body {
-    padding: 10px;
-  }
-
-  .cheat-btn {
-    width: 100%;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 7px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    margin-bottom: 5px;
-    text-align: left;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .cheat-btn:hover {
-    background: var(--accent);
-    color: #000;
-    border-color: var(--accent);
-  }
-
-  .cheat-btn .icon { font-size: 14px; }
+  :root{--bg:#0a0a0f;--panel:#12121a;--border:#2a2a3a;--accent:#ff6b35;--accent2:#ffcc00;--text:#e0e0f0;--muted:#666680;--success:#00ff88;--candy:#ff4488;--rebirth:#cc44ff;--sugar:#ff88ff;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+  #topbar{background:var(--panel);border-bottom:2px solid var(--accent);padding:6px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:6px;}
+  #topbar h1{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--accent);letter-spacing:2px;white-space:nowrap;}
+  #candy-count{font-family:'Orbitron',sans-serif;font-size:13px;color:var(--accent2);text-align:center;line-height:1.3;}
+  #candy-count span{font-size:9px;color:var(--muted);display:block;}
+  #right-stats{text-align:right;font-size:10px;line-height:1.7;}
+  #cps-display{color:var(--success);}#rebirth-info{color:var(--rebirth);}#sugar-info{color:var(--sugar);}
+  #nav-tabs{display:flex;background:var(--panel);border-bottom:1px solid var(--border);flex-shrink:0;}
+  .tab-btn{flex:1;padding:7px 2px;background:none;border:none;color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px;border-bottom:2px solid transparent;transition:all 0.2s;}
+  .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .tab-btn:hover{color:var(--text);}
+  .page{display:none;flex:1;overflow:hidden;}
+  .page.active{display:flex;}
+  #click-zone{flex:0 0 230px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1a0a1a 0%,var(--bg) 70%);border-right:1px solid var(--border);position:relative;overflow:hidden;}
+  #click-zone::before{content:'';position:absolute;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(255,68,136,0.06) 0%,transparent 70%);animation:pulse 3s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:0.5;}50%{transform:scale(1.2);opacity:1;}}
+  #candy-btn{width:140px;height:140px;border-radius:50%;border:none;cursor:pointer;transition:transform 0.05s;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;font-size:80px;user-select:none;-webkit-user-select:none;background:none;filter:drop-shadow(0 0 20px rgba(255,68,136,0.6));}
+  #candy-btn:active{transform:scale(0.9);}#candy-btn:hover{filter:drop-shadow(0 0 35px rgba(255,68,136,0.9));}
+  #rebirth-badge{position:absolute;top:8px;right:8px;background:var(--rebirth);color:#fff;font-family:'Orbitron',sans-serif;font-size:8px;padding:3px 6px;border-radius:10px;font-weight:900;display:none;}
+  #click-label{margin-top:10px;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+  #click-power-display{margin-top:4px;font-size:11px;color:var(--candy);}
+  .click-float{position:fixed;pointer-events:none;font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;color:var(--accent2);text-shadow:0 0 10px rgba(255,204,0,0.8);animation:floatUp 1s ease-out forwards;z-index:9999;}
+  @keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-70px) scale(0.5);}}
+  #golden-candy{position:absolute;font-size:36px;cursor:pointer;animation:goldenFloat 3s ease-in-out infinite,goldenGlow 1s ease-in-out infinite alternate;z-index:10;display:none;}
+  @keyframes goldenFloat{0%,100%{transform:translateY(0) rotate(-10deg);}50%{transform:translateY(-15px) rotate(10deg);}}
+  @keyframes goldenGlow{from{filter:drop-shadow(0 0 5px gold);}to{filter:drop-shadow(0 0 20px gold) drop-shadow(0 0 40px orange);}}
+  #upgrades-panel{flex:0 0 160px;background:var(--panel);border-right:1px solid var(--border);overflow-y:auto;padding:7px;}
+  .panel-title{font-family:'Orbitron',sans-serif;font-size:9px;color:var(--accent);letter-spacing:2px;margin-bottom:7px;text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:5px;position:sticky;top:0;background:inherit;z-index:5;}
+  .upgrade-item{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:6px;margin-bottom:4px;cursor:pointer;transition:all 0.2s;opacity:0.3;pointer-events:none;}
+  .upgrade-item.available{opacity:1;pointer-events:all;border-color:var(--accent2);box-shadow:0 0 6px rgba(255,204,0,0.2);}
+  .upgrade-item.available:hover{background:rgba(255,204,0,0.1);transform:translateX(2px);}
+  .upgrade-item.bought{opacity:0.15;pointer-events:none;border-color:var(--success);}
+  .upg-name{font-size:10px;font-weight:700;color:var(--accent2);}
+  .upg-desc{font-size:9px;color:var(--muted);margin-top:1px;}
+  .upg-cost{font-size:9px;color:var(--candy);margin-top:1px;}
+  #shop{flex:1;overflow-y:auto;padding:7px;background:var(--bg);}
+  #shop .panel-title{background:var(--bg);}
+  .building-item{background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:7px 9px;margin-bottom:4px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:7px;}
+  .building-item:hover:not(.locked){border-color:var(--accent);background:rgba(255,107,53,0.1);transform:translateX(3px);}
+  .building-item.locked{opacity:0.2;cursor:not-allowed;}
+  .building-item.affordable{border-color:var(--accent2);box-shadow:0 0 8px rgba(255,204,0,0.12);}
+  .b-icon{font-size:20px;flex-shrink:0;width:26px;text-align:center;}
+  .b-info{flex:1;}
+  .b-name{font-size:12px;font-weight:700;color:var(--text);}
+  .b-desc{font-size:9px;color:var(--muted);margin-top:1px;}
+  .b-cps{font-size:9px;color:var(--success);margin-top:1px;}
+  .b-right{text-align:right;flex-shrink:0;}
+  .b-cost{font-family:'Orbitron',sans-serif;font-size:10px;color:var(--accent2);}
+  .b-owned{font-size:18px;font-weight:900;color:var(--accent);font-family:'Orbitron',sans-serif;}
+  #rebirth-page{flex-direction:column;overflow-y:auto;padding:14px;gap:12px;}
+  .rb-card{background:var(--panel);border:2px solid var(--rebirth);border-radius:12px;padding:16px;text-align:center;}
+  .rb-card h2{font-family:'Orbitron',sans-serif;color:var(--rebirth);font-size:15px;margin-bottom:7px;letter-spacing:2px;}
+  .rb-card p{color:var(--muted);font-size:12px;margin-bottom:4px;}
+  .rb-req{font-size:14px;color:var(--accent2);font-weight:700;margin:8px 0;}
+  .rb-reward{font-size:12px;color:var(--sugar);margin-bottom:12px;}
+  .rb-candy-preview{font-size:48px;margin:8px 0;}
+  #rebirth-btn{background:linear-gradient(135deg,var(--rebirth),#8822cc);border:none;color:#fff;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;padding:11px 32px;border-radius:8px;cursor:pointer;letter-spacing:2px;transition:all 0.2s;box-shadow:0 0 20px rgba(204,68,255,0.4);}
+  #rebirth-btn:hover:not(:disabled){box-shadow:0 0 40px rgba(204,68,255,0.7);transform:scale(1.05);}
+  #rebirth-btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .rb-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:12px;}
+  .rb-stat{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:9px;text-align:center;}
+  .rb-stat-val{font-family:'Orbitron',sans-serif;font-size:15px;color:var(--rebirth);}
+  .rb-stat-label{font-size:9px;color:var(--muted);margin-top:2px;}
+  #rshop-page{flex-direction:column;overflow-y:auto;padding:12px;gap:9px;}
+  .sugar-bar{background:var(--panel);border:2px solid var(--sugar);border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .sugar-bar .sv{font-family:'Orbitron',sans-serif;font-size:18px;color:var(--sugar);}
+  .sugar-bar .sl{font-size:11px;color:var(--muted);}
+  .perm-item{background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:11px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:all 0.2s;}
+  .perm-item:hover:not(.maxed):not(.cant-afford){border-color:var(--sugar);background:rgba(255,136,255,0.08);transform:translateX(3px);}
+  .perm-item.maxed{opacity:0.3;cursor:not-allowed;}
+  .perm-item.cant-afford{opacity:0.5;cursor:not-allowed;}
+  .pi-icon{font-size:28px;flex-shrink:0;}
+  .pi-info{flex:1;}
+  .pi-name{font-size:13px;font-weight:700;color:var(--sugar);}
+  .pi-desc{font-size:10px;color:var(--muted);margin-top:2px;}
+  .pi-level{font-size:10px;color:var(--accent2);margin-top:2px;}
+  .pi-cost{font-family:'Orbitron',sans-serif;font-size:12px;color:var(--accent2);text-align:right;white-space:nowrap;}
+  #wheel-page{flex-direction:column;align-items:center;justify-content:center;padding:12px;gap:12px;overflow:hidden;}
+  #spins-display{font-family:'Orbitron',sans-serif;font-size:12px;color:var(--accent2);}
+  #wheel-wrap{position:relative;width:300px;height:300px;flex-shrink:0;}
+  #wheel-canvas{border-radius:50%;box-shadow:0 0 30px rgba(255,107,53,0.5);}
+  #wheel-ptr{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:26px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.9));z-index:2;}
+  #spin-btn{background:linear-gradient(135deg,var(--accent),#ff2200);border:none;color:#fff;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;padding:11px 32px;border-radius:8px;cursor:pointer;letter-spacing:2px;transition:all 0.2s;box-shadow:0 0 20px rgba(255,107,53,0.4);}
+  #spin-btn:hover:not(:disabled){box-shadow:0 0 40px rgba(255,107,53,0.7);transform:scale(1.05);}
+  #spin-btn:disabled{opacity:0.4;cursor:not-allowed;}
+  #wheel-result{font-family:'Orbitron',sans-serif;font-size:13px;color:var(--accent2);text-align:center;min-height:20px;}
+  #special-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+  #special-overlay .sc{font-size:100px;animation:bigPulse 0.4s ease-in-out infinite alternate;}
+  @keyframes bigPulse{from{transform:scale(1) rotate(-5deg);}to{transform:scale(1.12) rotate(5deg);}}
+  #special-overlay h2{font-family:'Orbitron',sans-serif;color:var(--accent2);font-size:20px;text-align:center;text-shadow:0 0 20px gold;}
+  #special-overlay p{color:var(--text);font-size:14px;text-align:center;max-width:300px;}
+  #special-close{background:var(--accent);border:none;color:#fff;font-family:'Orbitron',sans-serif;font-size:11px;padding:9px 26px;border-radius:8px;cursor:pointer;margin-top:6px;}
+  .confetti{position:fixed;pointer-events:none;z-index:99998;font-size:20px;animation:cfFall 3s ease-in forwards;}
+  @keyframes cfFall{0%{opacity:1;transform:translateY(-20px) rotate(0deg);}100%{opacity:0;transform:translateY(100vh) rotate(720deg);}}
+  #rebirth-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:99990;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+  #rebirth-overlay .rb-emoji{font-size:90px;animation:rbPulse 0.5s ease-in-out infinite alternate;}
+  @keyframes rbPulse{from{transform:scale(1);}to{transform:scale(1.15);}}
+  #rebirth-overlay h2{font-family:'Orbitron',sans-serif;color:var(--rebirth);font-size:24px;text-shadow:0 0 20px var(--rebirth);}
+  #rebirth-overlay p{color:var(--text);font-size:14px;text-align:center;max-width:300px;}
+  #notification{position:fixed;top:56px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--accent2);color:var(--accent2);padding:8px 16px;border-radius:8px;font-family:'Orbitron',sans-serif;font-size:10px;z-index:10000;opacity:0;transition:opacity 0.3s;pointer-events:none;box-shadow:0 0 20px rgba(255,204,0,0.3);white-space:nowrap;}
+  #admin-panel{position:fixed;left:0;top:50%;transform:translateY(-50%);background:#0d0d15;border:2px solid var(--accent);border-left:none;border-radius:0 12px 12px 0;z-index:9998;width:185px;transition:transform 0.3s;display:none;}
+  #admin-panel.minimised{transform:translateY(-50%) translateX(-160px);}
+  #admin-header{background:var(--accent);padding:6px 10px;display:flex;align-items:center;justify-content:space-between;border-radius:0 10px 0 0;}
+  #admin-header span{font-family:'Orbitron',sans-serif;font-size:8px;color:#000;font-weight:900;letter-spacing:1px;}
+  #admin-toggle{background:none;border:none;cursor:pointer;font-size:12px;color:#000;font-weight:900;}
+  #admin-body{padding:7px;max-height:65vh;overflow-y:auto;}
+  .cheat-btn{width:100%;background:var(--panel);border:1px solid var(--border);color:var(--text);padding:5px 7px;border-radius:5px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;margin-bottom:3px;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:5px;}
+  .cheat-btn:hover{background:var(--accent);color:#000;border-color:var(--accent);}
+  .cheat-section{font-family:'Orbitron',sans-serif;font-size:7px;color:var(--muted);letter-spacing:1px;margin:5px 0 3px;text-transform:uppercase;border-top:1px solid var(--border);padding-top:5px;}
+  ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
 <div id="topbar">
   <h1>⚡ VANDREX</h1>
   <div id="candy-count">
     <div id="count-display">0 candies</div>
     <span id="total-display">Total: 0 baked</span>
   </div>
-  <div id="cps-display">0 per second</div>
+  <div id="right-stats">
+    <div id="cps-display">0/sec</div>
+    <div id="rebirth-info">Rebirths: 0</div>
+    <div id="sugar-info">Sugar: 0 🍬</div>
+  </div>
 </div>
 
-<!-- NOTIFICATION -->
+<div id="nav-tabs">
+  <button class="tab-btn active" onclick="showPage('game')">🍭 Game</button>
+  <button class="tab-btn" onclick="showPage('rebirth')">♻️ Rebirth</button>
+  <button class="tab-btn" onclick="showPage('rshop')">🛍️ R-Shop</button>
+  <button class="tab-btn" onclick="showPage('wheel')">🎡 Wheel</button>
+</div>
+
 <div id="notification"></div>
 
-<!-- GAME -->
-<div id="game">
-
-  <!-- CLICK ZONE -->
+<div class="page active" id="game-page">
   <div id="click-zone">
     <div id="golden-candy" onclick="goldenClick()">🍬</div>
+    <div id="rebirth-badge">REBIRTH 0</div>
     <button id="candy-btn" onclick="clickCandy(event)">🍭</button>
     <div id="click-label">Click to make candy</div>
-    <div id="click-power">+<span id="click-val">1</span> per click</div>
+    <div id="click-power-display">+<span id="click-val">1</span> per click</div>
   </div>
-
-  <!-- UPGRADES -->
   <div id="upgrades-panel">
-    <h3>🔬 Upgrades</h3>
+    <div class="panel-title">🔬 Upgrades</div>
     <div id="upgrades-list"></div>
   </div>
-
-  <!-- SHOP -->
   <div id="shop">
-    <h3>🏪 Buildings</h3>
+    <div class="panel-title">🏪 Buildings</div>
     <div id="buildings-list"></div>
   </div>
-
 </div>
 
-<!-- ADMIN PANEL -->
+<div class="page" id="rebirth-page">
+  <div class="rb-card">
+    <h2>♻️ REBIRTH</h2>
+    <p>Reset your run and ascend to a higher candy form.</p>
+    <p>Each rebirth earns you <strong style="color:var(--sugar)">Sugar</strong> and 1 Wheel Spin.</p>
+    <div class="rb-candy-preview" id="next-candy-preview">🍭 → 🍬</div>
+    <div class="rb-req" id="rb-req-text">Requirement: 1,000,000 total candies baked</div>
+    <div class="rb-reward" id="rb-reward-text">Reward: +10 Sugar + 1 Spin</div>
+    <button id="rebirth-btn" onclick="doRebirth()" disabled>REBIRTH</button>
+    <div class="rb-stats">
+      <div class="rb-stat"><div class="rb-stat-val" id="stat-rb">0</div><div class="rb-stat-label">Rebirths</div></div>
+      <div class="rb-stat"><div class="rb-stat-val" id="stat-sugar">0</div><div class="rb-stat-label">Total Sugar</div></div>
+      <div class="rb-stat"><div class="rb-stat-val" id="stat-spins">0</div><div class="rb-stat-label">Spins Used</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="rshop-page">
+  <div class="sugar-bar">
+    <span style="font-size:22px">🍬</span>
+    <div><div class="sv" id="sugar-display">0</div><div class="sl">Sugar to spend</div></div>
+  </div>
+  <div id="perm-list"></div>
+</div>
+
+<div class="page" id="wheel-page">
+  <div id="spins-display">🎡 Spins: <span id="spins-count">0</span></div>
+  <div id="wheel-wrap">
+    <div id="wheel-ptr">▼</div>
+    <canvas id="wheel-canvas" width="300" height="300"></canvas>
+  </div>
+  <button id="spin-btn" onclick="spinWheel()" disabled>SPIN THE WHEEL</button>
+  <div id="wheel-result"></div>
+</div>
+
+<div id="special-overlay">
+  <div class="sc" id="special-emoji">🌟</div>
+  <h2 id="special-title">LEGENDARY!</h2>
+  <p id="special-desc"></p>
+  <button id="special-close" onclick="document.getElementById('special-overlay').style.display='none'">AMAZING! CLOSE</button>
+</div>
+
+<div id="rebirth-overlay">
+  <div class="rb-emoji" id="rb-anim-emoji">♻️</div>
+  <h2>REBIRTH!</h2>
+  <p id="rb-overlay-text">Ascending...</p>
+</div>
+
 <div id="admin-panel">
   <div id="admin-header">
     <span>⚡ ADMIN CHEATS</span>
     <button id="admin-toggle" onclick="toggleAdmin()">◀</button>
   </div>
   <div id="admin-body">
-    <button class="cheat-btn" onclick="cheat('maxcandies')"><span class="icon">🍬</span>Max Candies</button>
-    <button class="cheat-btn" onclick="cheat('unlockbuildings')"><span class="icon">🏗️</span>All Buildings x100</button>
-    <button class="cheat-btn" onclick="cheat('unlockupgrades')"><span class="icon">🔬</span>All Upgrades</button>
-    <button class="cheat-btn" onclick="cheat('autoclick')"><span class="icon">🖱️</span>Auto Click</button>
-    <button class="cheat-btn" onclick="cheat('goldenspam')"><span class="icon">✨</span>Golden Spam</button>
-    <button class="cheat-btn" onclick="cheat('maxcps')"><span class="icon">⚡</span>Max CPS</button>
-    <button class="cheat-btn" onclick="cheat('reset')" style="border-color:#ff4444;color:#ff4444;"><span class="icon">🔄</span>Reset Game</button>
+    <div class="cheat-section">Candy</div>
+    <button class="cheat-btn" onclick="cheat('maxcandies')">🍬 Max Candies</button>
+    <button class="cheat-btn" onclick="cheat('unlockbuildings')">🏗️ All Buildings x100</button>
+    <button class="cheat-btn" onclick="cheat('unlockupgrades')">🔬 All Upgrades</button>
+    <button class="cheat-btn" onclick="cheat('autoclick')">🖱️ Toggle Auto Click</button>
+    <button class="cheat-btn" onclick="cheat('goldenspam')">✨ Toggle Golden Spam</button>
+    <button class="cheat-btn" onclick="cheat('maxcps')">⚡ Max CPS</button>
+    <button class="cheat-btn" onclick="cheat('maxclick')">💥 Max Click Power</button>
+    <div class="cheat-section">Rebirth</div>
+    <button class="cheat-btn" onclick="cheat('addsugar')">🍬 +100 Sugar</button>
+    <button class="cheat-btn" onclick="cheat('addspins')">🎡 +10 Wheel Spins</button>
+    <button class="cheat-btn" onclick="cheat('unlockperm')">🛍️ Max All Perm Upgrades</button>
+    <button class="cheat-btn" onclick="cheat('forcerebirth')">♻️ Force Rebirth</button>
+    <div class="cheat-section">Danger</div>
+    <button class="cheat-btn" onclick="cheat('reset')" style="border-color:#ff4444;color:#ff4444;">🔄 Reset Everything</button>
   </div>
 </div>
 
 <script>
-// ============ GAME STATE ============
-let candies = 0;
-let totalCandies = 0;
-let cps = 0;
-let clickPower = 1;
-let autoClickInterval = null;
-let goldenInterval = null;
-let goldenSpamInterval = null;
-let adminMinimised = false;
+const REBIRTH_CANDIES=['🍭','🍬','🍫','🧁','🍰','🎂','🍩','🍪','🧇','🍯','💎','⭐','🌟','✨','🔮','👑'];
+const REBIRTH_NAMES=['Lollipop','Sweet','Chocolate','Cupcake','Cake','Party','Donut','Cookie','Waffle','Golden','Diamond','Star','Cosmic','Mystic','Crystal','Legendary'];
 
-const buildings = [
-  { id:'cursor',    name:'Cursor',              icon:'🖱️',  baseCost:15,           baseCps:0.1,    desc:'Autoclicks the candy for you.',           owned:0 },
-  { id:'lollipop',  name:'Lollipop Stand',      icon:'🍭',  baseCost:50,           baseCps:0.3,    desc:'A small stand selling lollipops.',         owned:0 },
-  { id:'grandma',   name:'Grandma',             icon:'👵',  baseCost:100,          baseCps:0.5,    desc:'A nice grandma who bakes candies.',        owned:0 },
-  { id:'farm',      name:'Candy Farm',           icon:'🌾',  baseCost:500,          baseCps:2,      desc:'Grows candies from sugarcane.',            owned:0 },
-  { id:'mine',      name:'Sugar Mine',           icon:'⛏️',  baseCost:1000,         baseCps:5,      desc:'Mines deep sugar deposits.',               owned:0 },
-  { id:'factory',   name:'Candy Factory',        icon:'🏭',  baseCost:5000,         baseCps:15,     desc:'Mass produces candies 24/7.',              owned:0 },
-  { id:'bank',      name:'Chocolate Bank',       icon:'🏦',  baseCost:15000,        baseCps:40,     desc:'Generates candy interest.',                owned:0 },
-  { id:'temple',    name:'Candy Temple',         icon:'🛕',  baseCost:50000,        baseCps:100,    desc:'Worshippers offer candies.',               owned:0 },
-  { id:'wizard',    name:'Wizard Tower',         icon:'🧙',  baseCost:150000,       baseCps:250,    desc:'Summons candies from thin air.',           owned:0 },
-  { id:'ship',      name:'Shipment',             icon:'🚀',  baseCost:500000,       baseCps:500,    desc:'Imports candies from outer space.',        owned:0 },
-  { id:'alchemy',   name:'Alchemy Lab',          icon:'⚗️',  baseCost:1500000,      baseCps:1000,   desc:'Turns gold into candy.',                  owned:0 },
-  { id:'portal',    name:'Portal',               icon:'🌀',  baseCost:5000000,      baseCps:2500,   desc:'Connects to a candy dimension.',           owned:0 },
-  { id:'time',      name:'Time Machine',         icon:'⏰',  baseCost:15000000,     baseCps:5000,   desc:'Borrows candies from the future.',         owned:0 },
-  { id:'antimatter',name:'Antimatter Condenser', icon:'⚛️',  baseCost:50000000,     baseCps:12000,  desc:'Converts matter into candy.',              owned:0 },
-  { id:'prism',     name:'Prism',                icon:'🔮',  baseCost:150000000,    baseCps:25000,  desc:'Turns light into candy.',                  owned:0 },
-  { id:'chance',    name:'Chancemaker',          icon:'🎲',  baseCost:500000000,    baseCps:50000,  desc:'Bends probability to make candy.',         owned:0 },
-  { id:'fractal',   name:'Fractal Engine',       icon:'🌐',  baseCost:1500000000,   baseCps:100000, desc:'Harnesses infinite candy loops.',          owned:0 },
-  { id:'js',        name:'Javascript Console',   icon:'💻',  baseCost:5000000000,   baseCps:250000, desc:'Codes candies into existence.',            owned:0 },
-  { id:'idle',      name:'Idleverse',            icon:'🌌',  baseCost:15000000000,  baseCps:500000, desc:'A whole universe of candy.',               owned:0 },
-  { id:'cortex',    name:'Cortex Baker',         icon:'🧠',  baseCost:50000000000,  baseCps:1000000,desc:'An AI that dreams of candy.',              owned:0 },
+const BUILDINGS=[
+  {id:'cursor',    name:'Cursor',             icon:'🖱️',baseCost:15,           baseCps:0.1,   desc:'Auto-clicks the candy.',            owned:0},
+  {id:'lollipop',  name:'Lollipop Stand',     icon:'🍭',baseCost:60,           baseCps:0.3,   desc:'A small sweet stand.',              owned:0},
+  {id:'grandma',   name:'Grandma',            icon:'👵',baseCost:150,          baseCps:0.8,   desc:'Bakes candy with love.',            owned:0},
+  {id:'farm',      name:'Candy Farm',          icon:'🌾',baseCost:600,          baseCps:3,     desc:'Grows sugarcane all day.',          owned:0},
+  {id:'mine',      name:'Sugar Mine',          icon:'⛏️',baseCost:1500,         baseCps:7,     desc:'Digs deep sugar deposits.',         owned:0},
+  {id:'factory',   name:'Candy Factory',       icon:'🏭',baseCost:6000,         baseCps:18,    desc:'Mass production facility.',         owned:0},
+  {id:'bank',      name:'Chocolate Bank',      icon:'🏦',baseCost:20000,        baseCps:50,    desc:'Earns candy interest.',             owned:0},
+  {id:'temple',    name:'Candy Temple',        icon:'🛕',baseCost:65000,        baseCps:120,   desc:'Worshippers bring offerings.',      owned:0},
+  {id:'wizard',    name:'Wizard Tower',        icon:'🧙',baseCost:200000,       baseCps:300,   desc:'Conjures candy from air.',          owned:0},
+  {id:'ship',      name:'Space Shipment',      icon:'🚀',baseCost:700000,       baseCps:600,   desc:'Imports from candy planets.',       owned:0},
+  {id:'alchemy',   name:'Alchemy Lab',         icon:'⚗️',baseCost:2000000,      baseCps:1200,  desc:'Turns lead into candy.',            owned:0},
+  {id:'portal',    name:'Candy Portal',        icon:'🌀',baseCost:7000000,      baseCps:3000,  desc:'Rift to candy dimensions.',         owned:0},
+  {id:'time',      name:'Time Machine',        icon:'⏰',baseCost:20000000,     baseCps:6000,  desc:'Borrows future candy.',             owned:0},
+  {id:'antimatter',name:'Antimatter',          icon:'⚛️',baseCost:70000000,     baseCps:15000, desc:'Converts matter to candy.',         owned:0},
+  {id:'prism',     name:'Rainbow Prism',       icon:'🔮',baseCost:200000000,    baseCps:30000, desc:'Refracts light into candy.',        owned:0},
+  {id:'chance',    name:'Chancemaker',         icon:'🎲',baseCost:700000000,    baseCps:60000, desc:'Bends luck to make candy.',         owned:0},
+  {id:'fractal',   name:'Fractal Engine',      icon:'🌐',baseCost:2000000000,   baseCps:120000,desc:'Infinite candy loops.',             owned:0},
+  {id:'jsconsole', name:'JS Console',          icon:'💻',baseCost:7000000000,   baseCps:300000,desc:'Codes candy into existence.',       owned:0},
+  {id:'idleverse', name:'Idleverse',           icon:'🌌',baseCost:20000000000,  baseCps:600000,desc:'A whole universe of candy.',        owned:0},
+  {id:'cortex',    name:'Cortex Baker',        icon:'🧠',baseCost:70000000000,  baseCps:1500000,desc:'AI that dreams of candy.',         owned:0},
+  {id:'singularity',name:'Candy Singularity',  icon:'🕳️',baseCost:200000000000, baseCps:4000000,desc:'Black hole of pure candy.',        owned:0},
+  {id:'godhand',   name:'God\'s Hand',         icon:'🤲',baseCost:700000000000, baseCps:10000000,desc:'Divine candy flows through you.',  owned:0},
+  {id:'bigbang',   name:'Big Bang Bakery',     icon:'💥',baseCost:2000000000000,baseCps:30000000,desc:'The universe bakes candy.',        owned:0},
 ];
 
-const upgrades = [
-  { id:'u1',  name:'Sugar Gloves',         desc:'Double your click power',              cost:100,        req:()=>totalCandies>=50,         effect:()=>{ clickPower*=2; } },
-  { id:'u2',  name:'Grandma\'s Recipe',    desc:'Grandmas produce 2x more',             cost:500,        req:()=>getOwned('grandma')>=1,   effect:()=>{ boostBuilding('grandma',2); } },
-  { id:'u3',  name:'Industrial Lollipops', desc:'Lollipop stands produce 2x more',      cost:1000,       req:()=>getOwned('lollipop')>=5,  effect:()=>{ boostBuilding('lollipop',2); } },
-  { id:'u4',  name:'Sugar Rush',           desc:'All CPS doubled',                      cost:5000,       req:()=>totalCandies>=1000,       effect:()=>{ cpsMultiplier*=2; recalcCps(); } },
-  { id:'u5',  name:'Reinforced Cursors',   desc:'Cursors produce 4x more',              cost:10000,      req:()=>getOwned('cursor')>=10,   effect:()=>{ boostBuilding('cursor',4); } },
-  { id:'u6',  name:'Farm Irrigation',      desc:'Candy farms produce 2x more',          cost:50000,      req:()=>getOwned('farm')>=5,      effect:()=>{ boostBuilding('farm',2); } },
-  { id:'u7',  name:'Power Gloves',         desc:'10x your click power',                 cost:100000,     req:()=>totalCandies>=50000,      effect:()=>{ clickPower*=10; } },
-  { id:'u8',  name:'Golden Candy Magnet',  desc:'Golden candies appear more often',      cost:500000,     req:()=>totalCandies>=100000,     effect:()=>{ goldenBonus=true; } },
-  { id:'u9',  name:'Factory Overdrive',    desc:'Factories produce 3x more',            cost:1000000,    req:()=>getOwned('factory')>=10,  effect:()=>{ boostBuilding('factory',3); } },
-  { id:'u10', name:'Quantum Sugar',        desc:'All CPS tripled',                      cost:5000000,    req:()=>totalCandies>=1000000,    effect:()=>{ cpsMultiplier*=3; recalcCps(); } },
-  { id:'u11', name:'Dark Matter Candy',    desc:'Antimatter produces 5x more',          cost:50000000,   req:()=>getOwned('antimatter')>=5,effect:()=>{ boostBuilding('antimatter',5); } },
-  { id:'u12', name:'Wizard Apprentice',    desc:'Wizard towers produce 3x more',        cost:10000000,   req:()=>getOwned('wizard')>=5,    effect:()=>{ boostBuilding('wizard',3); } },
-  { id:'u13', name:'Hyperspace Shipping',  desc:'Shipments produce 5x more',            cost:100000000,  req:()=>getOwned('ship')>=10,     effect:()=>{ boostBuilding('ship',5); } },
-  { id:'u14', name:'Philosopher\'s Stone', desc:'Alchemy labs produce 10x more',        cost:500000000,  req:()=>getOwned('alchemy')>=10,  effect:()=>{ boostBuilding('alchemy',10); } },
-  { id:'u15', name:'Candy Multiverse',     desc:'All CPS multiplied by 5',              cost:1000000000, req:()=>totalCandies>=100000000,  effect:()=>{ cpsMultiplier*=5; recalcCps(); } },
-  { id:'u16', name:'Temporal Paradox',     desc:'Time machines produce 10x more',       cost:5000000000, req:()=>getOwned('time')>=10,     effect:()=>{ boostBuilding('time',10); } },
-  { id:'u17', name:'Rainbow Prism',        desc:'Prisms produce 10x more',              cost:10000000000,req:()=>getOwned('prism')>=10,    effect:()=>{ boostBuilding('prism',10); } },
-  { id:'u18', name:'God Mode Clicking',    desc:'100x your click power',                cost:50000000000,req:()=>totalCandies>=10000000000,effect:()=>{ clickPower*=100; } },
-  { id:'u19', name:'Infinite Loop',        desc:'Fractal engines produce 20x more',     cost:100000000000,req:()=>getOwned('fractal')>=10, effect:()=>{ boostBuilding('fractal',20); } },
-  { id:'u20', name:'Candy God',            desc:'All production multiplied by 10',      cost:500000000000,req:()=>totalCandies>=100000000000,effect:()=>{ cpsMultiplier*=10; recalcCps(); } },
+const UPGRADES=[
+  {id:'u1', name:'Sugar Gloves',         desc:'2x click power',                    cost:100,           req:()=>TC>=50,           eff:()=>{CP*=2;}},
+  {id:'u2', name:'Grandma\'s Recipe',    desc:'Grandmas 2x productive',            cost:500,           req:()=>own('grandma')>=1, eff:()=>{bB('grandma',2);}},
+  {id:'u3', name:'Better Cursors',       desc:'Cursors 3x productive',             cost:1000,          req:()=>own('cursor')>=10, eff:()=>{bB('cursor',3);}},
+  {id:'u4', name:'Lolly Upgrade',        desc:'Lollipop stands 2x',                cost:2000,          req:()=>own('lollipop')>=5,eff:()=>{bB('lollipop',2);}},
+  {id:'u5', name:'Sugar Rush',           desc:'All CPS x2',                        cost:8000,          req:()=>TC>=2000,          eff:()=>{CM*=2;rCps();}},
+  {id:'u6', name:'Power Clicking',       desc:'10x click power',                   cost:20000,         req:()=>TC>=10000,         eff:()=>{CP*=10;}},
+  {id:'u7', name:'Farm Irrigation',      desc:'Candy farms 3x',                    cost:60000,         req:()=>own('farm')>=5,    eff:()=>{bB('farm',3);}},
+  {id:'u8', name:'Golden Magnet',        desc:'Golden candies appear more often',  cost:200000,        req:()=>TC>=100000,        eff:()=>{GB=true;}},
+  {id:'u9', name:'Factory Overdrive',    desc:'Factories 4x productive',           cost:800000,        req:()=>own('factory')>=10,eff:()=>{bB('factory',4);}},
+  {id:'u10',name:'Quantum Sugar',        desc:'All CPS x3',                        cost:3000000,       req:()=>TC>=1000000,       eff:()=>{CM*=3;rCps();}},
+  {id:'u11',name:'Wizard Apprentice',    desc:'Wizard towers 3x',                  cost:10000000,      req:()=>own('wizard')>=5,  eff:()=>{bB('wizard',3);}},
+  {id:'u12',name:'Hyperspace Cargo',     desc:'Shipments 5x productive',           cost:50000000,      req:()=>own('ship')>=10,   eff:()=>{bB('ship',5);}},
+  {id:'u13',name:'Dark Matter Candy',    desc:'Antimatter 5x productive',          cost:200000000,     req:()=>own('antimatter')>=5,eff:()=>{bB('antimatter',5);}},
+  {id:'u14',name:'Philosopher\'s Stone', desc:'Alchemy lab 10x productive',        cost:800000000,     req:()=>own('alchemy')>=10,eff:()=>{bB('alchemy',10);}},
+  {id:'u15',name:'Candy Multiverse',     desc:'All CPS x5',                        cost:3000000000,    req:()=>TC>=500000000,     eff:()=>{CM*=5;rCps();}},
+  {id:'u16',name:'Temporal Paradox',     desc:'Time machines 10x',                 cost:10000000000,   req:()=>own('time')>=10,   eff:()=>{bB('time',10);}},
+  {id:'u17',name:'Rainbow Refraction',   desc:'Prisms 10x productive',             cost:50000000000,   req:()=>own('prism')>=10,  eff:()=>{bB('prism',10);}},
+  {id:'u18',name:'God Mode Click',       desc:'100x click power',                  cost:200000000000,  req:()=>TC>=1e10,          eff:()=>{CP*=100;}},
+  {id:'u19',name:'Infinite Loop',        desc:'Fractal engines 20x',               cost:800000000000,  req:()=>own('fractal')>=10,eff:()=>{bB('fractal',20);}},
+  {id:'u20',name:'Candy God',            desc:'All CPS x10',                       cost:3000000000000, req:()=>TC>=1e11,          eff:()=>{CM*=10;rCps();}},
+  {id:'u21',name:'Singularity Upgrade',  desc:'Singularity 15x',                   cost:10000000000000,req:()=>own('singularity')>=5,eff:()=>{bB('singularity',15);}},
+  {id:'u22',name:'Divine Touch',         desc:'God\'s Hand 20x',                   cost:5e13,          req:()=>own('godhand')>=5, eff:()=>{bB('godhand',20);}},
+  {id:'u23',name:'Universe Baker',       desc:'Big Bang 25x productive',           cost:2e14,          req:()=>own('bigbang')>=5, eff:()=>{bB('bigbang',25);}},
+  {id:'u24',name:'Ascended Clicking',    desc:'1000x click power',                 cost:9e14,          req:()=>TC>=1e15,          eff:()=>{CP*=1000;}},
+  {id:'u25',name:'Beyond Infinity',      desc:'All CPS x100',                      cost:9e14,          req:()=>RB>=10,            eff:()=>{CM*=100;rCps();}},
 ];
 
-let boughtUpgrades = {};
-let buildingMultipliers = {};
-let cpsMultiplier = 1;
-let goldenBonus = false;
+const PERM=[
+  {id:'p1',name:'Sugar Boost',     icon:'🍬',desc:'Start with 10% of previous best candies per level',baseCost:5, max:10},
+  {id:'p2',name:'CPS Bonus',       icon:'⚡',desc:'+10% CPS per rebirth per level (stacks)',           baseCost:8, max:20},
+  {id:'p3',name:'Click Bonus',     icon:'💥',desc:'+20% click power per rebirth per level (stacks)',   baseCost:6, max:20},
+  {id:'p4',name:'Extra Sugar',     icon:'🍬',desc:'Earn +1 extra Sugar per rebirth per level',         baseCost:10,max:10},
+  {id:'p5',name:'Golden Touch',    icon:'✨',desc:'Golden candy bonus x2 per level',                   baseCost:12,max:5},
+  {id:'p6',name:'Wheel Fortune',   icon:'🎡',desc:'Start each rebirth with +1 extra wheel spin',        baseCost:15,max:5},
+  {id:'p7',name:'Building Boost',  icon:'🏗️',desc:'Buildings 5% cheaper per level',                    baseCost:20,max:10},
+  {id:'p8',name:'Sugar Multiplier',icon:'🌟',desc:'Earn 2x more Sugar per rebirth per level',           baseCost:50,max:5},
+];
 
-buildings.forEach(b => buildingMultipliers[b.id] = 1);
+const WHEEL=[
+  {label:'1M Candies',  emoji:'🍭',color:'#ff4488',val:'c1m',    special:false},
+  {label:'10 Sugar',    emoji:'🍬',color:'#cc44ff',val:'s10',    special:false},
+  {label:'2x CPS',      emoji:'⚡',color:'#ff6b35',val:'cps2',   special:false},
+  {label:'100M Candies',emoji:'🎉',color:'#ffcc00',val:'c100m',  special:false},
+  {label:'50 Sugar',    emoji:'💎',color:'#00ccff',val:'s50',    special:false},
+  {label:'FREE SPIN',   emoji:'🎡',color:'#00ff88',val:'spin',   special:false},
+  {label:'5x Click',    emoji:'💥',color:'#ff2266',val:'click5', special:false},
+  {label:'LEGENDARY!',  emoji:'🌟',color:'#fff700',val:'legend', special:true},
+  {label:'1B Candies',  emoji:'🚀',color:'#8844ff',val:'c1b',    special:false},
+  {label:'Instant RB',  emoji:'♻️',color:'#44ffaa',val:'ireb',   special:false},
+  {label:'10x CPS',     emoji:'🌈',color:'#ff88aa',val:'cps10',  special:false},
+  {label:'200 Sugar',   emoji:'👑',color:'#ffaa00',val:'s200',   special:false},
+];
 
-function getOwned(id) {
-  return buildings.find(b=>b.id===id)?.owned || 0;
-}
+// STATE
+let C=0,TC=0,CPS=0,CP=1,CM=1,GB=false;
+let BU={},BM={};
+let ACI=null,GSI=null,GSpI=null,adminMin=false;
+let RB=0,sugar=0,totalSugar=0,spins=0,spinsUsed=0,PL={},bestC=0;
+BUILDINGS.forEach(b=>BM[b.id]=1);
+PERM.forEach(p=>PL[p.id]=0);
 
-function boostBuilding(id, mult) {
-  buildingMultipliers[id] = (buildingMultipliers[id]||1) * mult;
-  recalcCps();
-}
+function own(id){return BUILDINGS.find(b=>b.id===id)?.owned||0;}
+function bB(id,m){BM[id]=(BM[id]||1)*m;rCps();}
+function bCost(b){return Math.ceil(b.baseCost*Math.pow(1.15,b.owned)*(1-0.05*(PL.p7||0)));}
+function rCps(){CPS=0;BUILDINGS.forEach(b=>CPS+=b.owned*b.baseCps*(BM[b.id]||1));CPS*=CM;CPS*=(1+0.1*RB*(PL.p2||0));}
+function getCPT(){return CP*(1+0.2*RB*(PL.p3||0));}
+function getCandyEmoji(){return REBIRTH_CANDIES[Math.min(RB,REBIRTH_CANDIES.length-1)];}
+function getRBReq(){return Math.floor(1000000*Math.pow(5,RB));}
+function getSugarReward(){return Math.floor((10+(PL.p4||0)+RB*2)*Math.pow(2,PL.p8||0));}
 
-function recalcCps() {
-  cps = 0;
-  buildings.forEach(b => {
-    cps += b.owned * b.baseCps * (buildingMultipliers[b.id]||1);
-  });
-  cps *= cpsMultiplier;
-}
-
-function getBuildingCost(b) {
-  return Math.ceil(b.baseCost * Math.pow(1.15, b.owned));
-}
-
-function formatNum(n) {
-  if (n >= 1e15) return (n/1e15).toFixed(2) + ' quadrillion';
-  if (n >= 1e12) return (n/1e12).toFixed(2) + ' trillion';
-  if (n >= 1e9)  return (n/1e9).toFixed(2) + ' billion';
-  if (n >= 1e6)  return (n/1e6).toFixed(2) + ' million';
-  if (n >= 1e3)  return (n/1e3).toFixed(1) + 'K';
+function fmtN(n){
+  if(n>=1e18)return(n/1e18).toFixed(2)+' quintillion';
+  if(n>=1e15)return(n/1e15).toFixed(2)+' quadrillion';
+  if(n>=1e12)return(n/1e12).toFixed(2)+' trillion';
+  if(n>=1e9)return(n/1e9).toFixed(2)+' billion';
+  if(n>=1e6)return(n/1e6).toFixed(2)+' million';
+  if(n>=1e3)return(n/1e3).toFixed(1)+'K';
   return Math.floor(n).toString();
 }
 
-// ============ RENDER ============
-function renderBuildings() {
-  const list = document.getElementById('buildings-list');
-  list.innerHTML = '';
-  buildings.forEach((b,i) => {
-    const cost = getBuildingCost(b);
-    const locked = i > 0 && buildings[i-1].owned === 0 && b.owned === 0;
-    const affordable = candies >= cost && !locked;
-    const div = document.createElement('div');
-    div.className = 'building-item' + (locked?' locked':'') + (affordable?' affordable':'');
-    div.title = b.desc;
-    div.innerHTML = `
-      <div class="building-icon">${b.icon}</div>
-      <div class="building-info">
-        <div class="building-name">${b.name}</div>
-        <div class="building-desc">${b.desc}</div>
-        <div class="building-cps">+${formatNum(b.baseCps * (buildingMultipliers[b.id]||1))} CPS each</div>
-      </div>
-      <div class="building-right">
-        <div class="building-cost">${formatNum(cost)}</div>
-        <div class="building-owned">${b.owned}</div>
-      </div>
-    `;
-    if (!locked) div.onclick = () => buyBuilding(i);
+function notify(msg){
+  const el=document.getElementById('notification');
+  el.textContent=msg;el.style.opacity='1';
+  setTimeout(()=>el.style.opacity='0',2500);
+}
+
+// RENDER
+function renderBuildings(){
+  const list=document.getElementById('buildings-list');list.innerHTML='';
+  BUILDINGS.forEach((b,i)=>{
+    const cost=bCost(b);
+    const locked=i>0&&BUILDINGS[i-1].owned===0&&b.owned===0;
+    const affordable=C>=cost&&!locked;
+    const div=document.createElement('div');
+    div.className='building-item'+(locked?' locked':'')+(affordable?' affordable':'');
+    div.title=b.desc;
+    div.innerHTML=`<div class="b-icon">${b.icon}</div><div class="b-info"><div class="b-name">${b.name}</div><div class="b-desc">${b.desc}</div><div class="b-cps">+${fmtN(b.baseCps*(BM[b.id]||1))} CPS</div></div><div class="b-right"><div class="b-cost">${fmtN(cost)}</div><div class="b-owned">${b.owned}</div></div>`;
+    if(!locked)div.onclick=()=>buyB(i);
     list.appendChild(div);
   });
 }
 
-function renderUpgrades() {
-  const list = document.getElementById('upgrades-list');
-  list.innerHTML = '';
-  upgrades.forEach(u => {
-    if (boughtUpgrades[u.id]) return;
-    const available = u.req() && candies >= u.cost;
-    const show = u.req() || totalCandies >= u.cost * 0.1;
-    if (!show) return;
-    const div = document.createElement('div');
-    div.className = 'upgrade-item' + (available?' available':'') + (boughtUpgrades[u.id]?' bought':'');
-    div.innerHTML = `
-      <div class="upgrade-name">${u.name}</div>
-      <div class="upgrade-desc">${u.desc}</div>
-      <div class="upgrade-cost">🍬 ${formatNum(u.cost)}</div>
-    `;
-    if (available) div.onclick = () => buyUpgrade(u);
+function renderUpgrades(){
+  const list=document.getElementById('upgrades-list');list.innerHTML='';
+  UPGRADES.forEach(u=>{
+    if(BU[u.id])return;
+    const avail=u.req()&&C>=u.cost;
+    const show=u.req()||TC>=u.cost*0.05;
+    if(!show)return;
+    const div=document.createElement('div');
+    div.className='upgrade-item'+(avail?' available':'');
+    div.innerHTML=`<div class="upg-name">${u.name}</div><div class="upg-desc">${u.desc}</div><div class="upg-cost">🍬 ${fmtN(u.cost)}</div>`;
+    if(avail)div.onclick=()=>buyU(u);
     list.appendChild(div);
   });
 }
 
-function updateDisplay() {
-  document.getElementById('count-display').textContent = formatNum(candies) + ' candies';
-  document.getElementById('total-display').textContent = 'Total: ' + formatNum(totalCandies) + ' baked';
-  document.getElementById('cps-display').textContent = formatNum(cps) + ' per second';
-  document.getElementById('click-val').textContent = formatNum(clickPower);
+function renderPerm(){
+  const list=document.getElementById('perm-list');list.innerHTML='';
+  PERM.forEach(p=>{
+    const lvl=PL[p.id]||0;
+    const maxed=lvl>=p.max;
+    const cost=Math.ceil(p.baseCost*Math.pow(1.8,lvl));
+    const ca=sugar>=cost;
+    const div=document.createElement('div');
+    div.className='perm-item'+(maxed?' maxed':(!ca?' cant-afford':''));
+    div.innerHTML=`<div class="pi-icon">${p.icon}</div><div class="pi-info"><div class="pi-name">${p.name}</div><div class="pi-desc">${p.desc}</div><div class="pi-level">Lv ${lvl}/${p.max}${maxed?' ✓':''}</div></div><div class="pi-cost">${maxed?'MAX':cost+' 🍬'}</div>`;
+    if(!maxed&&ca)div.onclick=()=>buyPerm(p);
+    list.appendChild(div);
+  });
 }
 
-// ============ ACTIONS ============
-function clickCandy(e) {
-  const earned = clickPower;
-  candies += earned;
-  totalCandies += earned;
-
-  // Float number
-  const el = document.createElement('div');
-  el.className = 'click-float';
-  el.textContent = '+' + formatNum(earned);
-  el.style.left = (e.clientX - 20) + 'px';
-  el.style.top = (e.clientY - 20) + 'px';
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 1000);
-
-  updateDisplay();
-  renderUpgrades();
+function renderRebirth(){
+  const req=getRBReq();const rew=getSugarReward();
+  const nextC=REBIRTH_CANDIES[Math.min(RB+1,REBIRTH_CANDIES.length-1)];
+  document.getElementById('next-candy-preview').textContent=getCandyEmoji()+' → '+nextC;
+  document.getElementById('rb-req-text').textContent='Requirement: '+fmtN(req)+' total candies baked';
+  document.getElementById('rb-reward-text').textContent='Reward: +'+rew+' Sugar 🍬 + 1 Wheel Spin';
+  document.getElementById('rebirth-btn').disabled=TC<req;
+  document.getElementById('stat-rb').textContent=RB;
+  document.getElementById('stat-sugar').textContent=totalSugar;
+  document.getElementById('stat-spins').textContent=spinsUsed;
 }
 
-function buyBuilding(i) {
-  const b = buildings[i];
-  const cost = getBuildingCost(b);
-  if (candies < cost) return;
-  candies -= cost;
-  b.owned++;
-  recalcCps();
-  notify('🏗️ Bought ' + b.name + '!');
-  renderBuildings();
-  renderUpgrades();
-  updateDisplay();
-  save();
+function updateDisplay(){
+  const cp=getCPT();
+  document.getElementById('count-display').textContent=fmtN(C)+' candies';
+  document.getElementById('total-display').textContent='Total: '+fmtN(TC)+' baked';
+  document.getElementById('cps-display').textContent=fmtN(CPS)+'/sec';
+  document.getElementById('rebirth-info').textContent='Rebirths: '+RB;
+  document.getElementById('sugar-info').textContent='Sugar: '+sugar+' 🍬';
+  document.getElementById('click-val').textContent=fmtN(cp);
+  document.getElementById('candy-btn').textContent=getCandyEmoji();
+  document.getElementById('sugar-display').textContent=sugar;
+  document.getElementById('spins-count').textContent=spins;
+  document.getElementById('spin-btn').disabled=spins<=0;
+  const badge=document.getElementById('rebirth-badge');
+  if(RB>0){badge.style.display='block';badge.textContent=REBIRTH_NAMES[Math.min(RB-1,REBIRTH_NAMES.length-1)];}
+  if(TC>bestC)bestC=TC;
 }
 
-function buyUpgrade(u) {
-  if (candies < u.cost || boughtUpgrades[u.id]) return;
-  candies -= u.cost;
-  boughtUpgrades[u.id] = true;
-  u.effect();
-  notify('🔬 Unlocked: ' + u.name + '!');
-  renderBuildings();
-  renderUpgrades();
-  updateDisplay();
-  save();
+// ACTIONS
+function clickCandy(e){
+  const earned=getCPT();C+=earned;TC+=earned;
+  const el=document.createElement('div');el.className='click-float';el.textContent='+'+fmtN(earned);el.style.left=(e.clientX-20)+'px';el.style.top=(e.clientY-20)+'px';document.body.appendChild(el);setTimeout(()=>el.remove(),1000);
+  updateDisplay();renderUpgrades();
 }
 
-// ============ GOLDEN CANDY ============
-function spawnGolden() {
-  const gc = document.getElementById('golden-candy');
-  const zone = document.getElementById('click-zone');
-  const rect = zone.getBoundingClientRect();
-  gc.style.left = (20 + Math.random() * (rect.width - 80)) + 'px';
-  gc.style.top = (20 + Math.random() * (rect.height - 80)) + 'px';
-  gc.style.display = 'block';
-  setTimeout(() => { gc.style.display = 'none'; }, 13000);
+function buyB(i){
+  const b=BUILDINGS[i];const cost=bCost(b);if(C<cost)return;
+  C-=cost;b.owned++;rCps();notify('🏗️ Bought '+b.name+'!');
+  renderBuildings();renderUpgrades();updateDisplay();save();
 }
 
-function goldenClick() {
-  const bonus = Math.max(candies * 0.1, cps * 60, clickPower * 100);
-  candies += bonus;
-  totalCandies += bonus;
-  document.getElementById('golden-candy').style.display = 'none';
-  notify('✨ Golden Candy! +' + formatNum(bonus) + ' candies!');
-  updateDisplay();
-  save();
+function buyU(u){
+  if(C<u.cost||BU[u.id])return;
+  C-=u.cost;BU[u.id]=true;u.eff();notify('🔬 '+u.name+'!');
+  renderBuildings();renderUpgrades();updateDisplay();save();
 }
 
-function startGoldenTimer() {
-  if (goldenInterval) clearInterval(goldenInterval);
-  const interval = goldenBonus ? 20000 : 45000;
-  goldenInterval = setInterval(spawnGolden, interval + Math.random() * 30000);
+function buyPerm(p){
+  const lvl=PL[p.id]||0;if(lvl>=p.max)return;
+  const cost=Math.ceil(p.baseCost*Math.pow(1.8,lvl));if(sugar<cost)return;
+  sugar-=cost;PL[p.id]=lvl+1;notify('🛍️ '+p.name+' Lv'+(lvl+1)+'!');
+  renderPerm();updateDisplay();save();
 }
 
-// ============ NOTIFY ============
-function notify(msg) {
-  const el = document.getElementById('notification');
-  el.textContent = msg;
-  el.style.opacity = '1';
-  setTimeout(() => { el.style.opacity = '0'; }, 2500);
+function doRebirth(){
+  if(TC<getRBReq())return;
+  const rew=getSugarReward();
+  const nextE=REBIRTH_CANDIES[Math.min(RB+1,REBIRTH_CANDIES.length-1)];
+  const o=document.getElementById('rebirth-overlay');
+  document.getElementById('rb-anim-emoji').textContent=nextE;
+  document.getElementById('rb-overlay-text').textContent='Earned +'+rew+' Sugar! Your candy evolves to '+nextE;
+  o.style.display='flex';
+  setTimeout(()=>{
+    o.style.display='none';
+    RB++;sugar+=rew;totalSugar+=rew;spins++;spins+=(PL.p6||0);
+    const boost=bestC*(0.1*(PL.p1||0));
+    C=boost;TC=0;CP=1;CM=1;BU={};
+    BUILDINGS.forEach(b=>{b.owned=0;BM[b.id]=1;});
+    if(ACI){clearInterval(ACI);ACI=null;}
+    if(GSpI){clearInterval(GSpI);GSpI=null;}
+    rCps();renderBuildings();renderUpgrades();renderRebirth();renderPerm();updateDisplay();drawWheel();save();
+    notify('♻️ Rebirth '+RB+'! You are now a '+REBIRTH_NAMES[Math.min(RB-1,REBIRTH_NAMES.length-1)]+' Candy Maker!');
+    showPage('game');
+  },3000);
 }
 
-// ============ SAVE / LOAD ============
-function save() {
-  const data = {
-    candies, totalCandies, clickPower, cpsMultiplier,
-    boughtUpgrades, buildingMultipliers,
-    buildings: buildings.map(b => ({ id:b.id, owned:b.owned }))
-  };
-  localStorage.setItem('vandrex_candy', JSON.stringify(data));
+function spawnGolden(){
+  const gc=document.getElementById('golden-candy');
+  const zone=document.getElementById('click-zone');const rect=zone.getBoundingClientRect();
+  gc.style.left=(20+Math.random()*(rect.width-80))+'px';gc.style.top=(20+Math.random()*(rect.height-80))+'px';gc.style.display='block';
+  setTimeout(()=>gc.style.display='none',14000);
 }
 
-function load() {
-  try {
-    const raw = localStorage.getItem('vandrex_candy');
-    if (!raw) return;
-    const data = JSON.parse(raw);
-    candies = data.candies || 0;
-    totalCandies = data.totalCandies || 0;
-    clickPower = data.clickPower || 1;
-    cpsMultiplier = data.cpsMultiplier || 1;
-    boughtUpgrades = data.boughtUpgrades || {};
-    buildingMultipliers = data.buildingMultipliers || {};
-    if (data.buildings) {
-      data.buildings.forEach(saved => {
-        const b = buildings.find(x => x.id === saved.id);
-        if (b) b.owned = saved.owned || 0;
-      });
-    }
-    // Re-apply bought upgrade effects silently
-    upgrades.forEach(u => {
-      if (boughtUpgrades[u.id]) u.effect();
+function goldenClick(){
+  const gm=Math.pow(2,PL.p5||0);
+  const bonus=Math.max(C*0.1,CPS*60,getCPT()*100)*gm;
+  C+=bonus;TC+=bonus;document.getElementById('golden-candy').style.display='none';
+  notify('✨ Golden Candy! +'+fmtN(bonus)+' candies!');updateDisplay();save();
+}
+
+function startGoldenTimer(){
+  if(GSpI)clearInterval(GSpI);
+  GSpI=setInterval(spawnGolden,(GB?20000:45000)+Math.random()*30000);
+}
+
+// WHEEL
+let wAngle=0,wSpinning=false;
+
+function drawWheel(){
+  const cv=document.getElementById('wheel-canvas');const ctx=cv.getContext('2d');
+  const cx=150,cy=150,r=145,n=WHEEL.length,arc=(Math.PI*2)/n;
+  ctx.clearRect(0,0,300,300);
+  WHEEL.forEach((p,i)=>{
+    const s=i*arc-Math.PI/2,e=s+arc;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,s,e);
+    ctx.fillStyle=p.special?'#fff700':p.color;ctx.fill();
+    ctx.strokeStyle='#0a0a0f';ctx.lineWidth=2;ctx.stroke();
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(s+arc/2);ctx.textAlign='right';
+    ctx.fillStyle=p.special?'#000':'#fff';ctx.font=p.special?'bold 10px Rajdhani':'9px Rajdhani';
+    ctx.fillText(p.emoji+' '+p.label,r-5,4);ctx.restore();
+  });
+  ctx.beginPath();ctx.arc(cx,cy,18,0,Math.PI*2);ctx.fillStyle='#0a0a0f';ctx.fill();
+  ctx.strokeStyle='#ff6b35';ctx.lineWidth=3;ctx.stroke();
+  ctx.fillStyle='#ff6b35';ctx.font='bold 13px Orbitron';ctx.textAlign='center';ctx.fillText('⚡',cx,cy+5);
+}
+
+function spinWheel(){
+  if(wSpinning||spins<=0)return;
+  wSpinning=true;spins--;spinsUsed++;updateDisplay();
+  document.getElementById('spin-btn').disabled=true;document.getElementById('wheel-result').textContent='';
+  const totalSpin=(Math.PI*2*8)+Math.random()*Math.PI*2;
+  const dur=4000,startT=performance.now(),startA=wAngle;
+  function anim(now){
+    const el=now-startT,prog=Math.min(el/dur,1),ease=1-Math.pow(1-prog,4);
+    wAngle=startA+totalSpin*ease;
+    const cv=document.getElementById('wheel-canvas');const ctx=cv.getContext('2d');
+    const cx=150,cy=150,r=145,n=WHEEL.length,arc=(Math.PI*2)/n;
+    ctx.clearRect(0,0,300,300);ctx.save();ctx.translate(cx,cy);ctx.rotate(wAngle);ctx.translate(-cx,-cy);
+    WHEEL.forEach((p,i)=>{
+      const s=i*arc-Math.PI/2,e=s+arc;
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,s,e);
+      ctx.fillStyle=p.special?'#fff700':p.color;ctx.fill();ctx.strokeStyle='#0a0a0f';ctx.lineWidth=2;ctx.stroke();
+      ctx.save();ctx.translate(cx,cy);ctx.rotate(s+arc/2);ctx.textAlign='right';
+      ctx.fillStyle=p.special?'#000':'#fff';ctx.font=p.special?'bold 10px Rajdhani':'9px Rajdhani';
+      ctx.fillText(p.emoji+' '+p.label,r-5,4);ctx.restore();
     });
-    recalcCps();
-  } catch(e) { console.log('Save load error:', e); }
+    ctx.restore();
+    ctx.beginPath();ctx.arc(cx,cy,18,0,Math.PI*2);ctx.fillStyle='#0a0a0f';ctx.fill();
+    ctx.strokeStyle='#ff6b35';ctx.lineWidth=3;ctx.stroke();
+    ctx.fillStyle='#ff6b35';ctx.font='bold 13px Orbitron';ctx.textAlign='center';ctx.fillText('⚡',cx,cy+5);
+    if(prog<1){requestAnimationFrame(anim);}
+    else{
+      wSpinning=false;
+      const fa=((wAngle%(Math.PI*2))+(Math.PI*2))%(Math.PI*2);
+      const pa=(Math.PI*2*1.5-fa+Math.PI*2)%(Math.PI*2);
+      const idx=Math.floor(pa/((Math.PI*2)/WHEEL.length))%WHEEL.length;
+      applyPrize(WHEEL[idx]);
+      document.getElementById('spin-btn').disabled=spins<=0;save();
+    }
+  }
+  requestAnimationFrame(anim);
 }
 
-// ============ ADMIN ============
-function toggleAdmin() {
-  adminMinimised = !adminMinimised;
-  const panel = document.getElementById('admin-panel');
-  const btn = document.getElementById('admin-toggle');
-  panel.classList.toggle('minimised', adminMinimised);
-  btn.textContent = adminMinimised ? '▶' : '◀';
+function applyPrize(p){
+  let msg='';
+  switch(p.val){
+    case 'c1m':C+=1e6;TC+=1e6;msg='🍭 +1M Candies!';break;
+    case 'c100m':C+=1e8;TC+=1e8;msg='🎉 +100M Candies!';break;
+    case 'c1b':C+=1e9;TC+=1e9;msg='🚀 +1B Candies!';break;
+    case 's10':sugar+=10;totalSugar+=10;msg='🍬 +10 Sugar!';break;
+    case 's50':sugar+=50;totalSugar+=50;msg='💎 +50 Sugar!';break;
+    case 's200':sugar+=200;totalSugar+=200;msg='👑 +200 Sugar!';break;
+    case 'cps2':CM*=2;rCps();msg='⚡ CPS x2!';break;
+    case 'cps10':CM*=10;rCps();msg='🌈 CPS x10!';break;
+    case 'click5':CP*=5;msg='💥 Click x5!';break;
+    case 'spin':spins++;msg='🎡 Free Spin!';break;
+    case 'ireb':if(TC>=getRBReq()){doRebirth();msg='♻️ Instant Rebirth!';}else{C+=TC*0.5;msg='♻️ Not ready — +50% bonus candies!';}break;
+    case 'legend':
+      const lb=Math.max(1e12,CPS*86400);C+=lb;TC+=lb;sugar+=500;totalSugar+=500;
+      showSpecial('🌟','LEGENDARY CANDY!','You found the legendary golden candy!\n+'+fmtN(lb)+' Candies & +500 Sugar!');
+      msg='🌟 LEGENDARY!';break;
+  }
+  document.getElementById('wheel-result').textContent='🎉 '+msg;
+  notify(msg);renderPerm();updateDisplay();
 }
 
-function showAdminIfNeeded() {
-  if (localStorage.getItem('vandrex_admin_unlocked') === 'true') {
-    document.getElementById('admin-panel').style.display = 'block';
+function showSpecial(emoji,title,desc){
+  const o=document.getElementById('special-overlay');
+  document.getElementById('special-emoji').textContent=emoji;
+  document.getElementById('special-title').textContent=title;
+  document.getElementById('special-desc').textContent=desc;
+  o.style.display='flex';
+  const cf=['🍬','🍭','⭐','✨','🌟','💎','🎉'];
+  for(let i=0;i<20;i++){
+    const c=document.createElement('div');c.className='confetti';
+    c.textContent=cf[Math.floor(Math.random()*cf.length)];
+    c.style.left=Math.random()*100+'vw';c.style.animationDelay=Math.random()*2+'s';
+    document.body.appendChild(c);setTimeout(()=>c.remove(),4000);
   }
 }
 
-function unlockAdmin() {
-  const pw = prompt('⚡ Enter admin password:');
-  if (pw === 'V@ndr3x#Esp0rts99') {
-    localStorage.setItem('vandrex_admin_unlocked', 'true');
-    document.getElementById('admin-panel').style.display = 'block';
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id+'-page').classList.add('active');
+  const tabs=['game','rebirth','rshop','wheel'];
+  document.querySelectorAll('.tab-btn')[tabs.indexOf(id)].classList.add('active');
+  if(id==='rebirth')renderRebirth();
+  if(id==='rshop')renderPerm();
+  if(id==='wheel')drawWheel();
+}
+
+function toggleAdmin(){
+  adminMin=!adminMin;
+  document.getElementById('admin-panel').classList.toggle('minimised',adminMin);
+  document.getElementById('admin-toggle').textContent=adminMin?'▶':'◀';
+}
+
+function showAdminIfNeeded(){
+  if(localStorage.getItem('vandrex_admin_unlocked')==='true')
+    document.getElementById('admin-panel').style.display='block';
+}
+
+function unlockAdmin(){
+  const pw=prompt('⚡ Enter admin password:');
+  if(pw==='V@ndr3x#Esp0rts99'){
+    localStorage.setItem('vandrex_admin_unlocked','true');
+    document.getElementById('admin-panel').style.display='block';
     notify('⚡ Admin mode unlocked!');
-  } else if (pw !== null) {
-    notify('❌ Wrong password!');
-  }
+  }else if(pw!==null)notify('❌ Wrong password!');
 }
 
-// Type "aaron" anywhere to trigger admin unlock
-let typedBuffer = '';
-document.addEventListener('keydown', (e) => {
-  typedBuffer += e.key.toLowerCase();
-  if (typedBuffer.length > 10) typedBuffer = typedBuffer.slice(-10);
-  if (typedBuffer.includes('aaron')) {
-    typedBuffer = '';
-    unlockAdmin();
-  }
+let tBuf='';
+document.addEventListener('keydown',e=>{
+  tBuf+=e.key.toLowerCase();if(tBuf.length>10)tBuf=tBuf.slice(-10);
+  if(tBuf.includes('aaron')){tBuf='';unlockAdmin();}
 });
 
-function cheat(type) {
-  switch(type) {
-    case 'maxcandies':
-      candies = 999999999999999;
-      totalCandies = Math.max(totalCandies, candies);
-      notify('🍬 Max candies applied!');
-      break;
-    case 'unlockbuildings':
-      buildings.forEach(b => { b.owned = 100; });
-      recalcCps();
-      notify('🏗️ All buildings set to 100!');
-      break;
-    case 'unlockupgrades':
-      upgrades.forEach(u => {
-        if (!boughtUpgrades[u.id]) { boughtUpgrades[u.id] = true; u.effect(); }
-      });
-      recalcCps();
-      notify('🔬 All upgrades unlocked!');
-      break;
+function cheat(t){
+  switch(t){
+    case 'maxcandies':C=999999999999999;TC=Math.max(TC,999999999999999);notify('🍬 Max candies!');break;
+    case 'unlockbuildings':BUILDINGS.forEach(b=>b.owned=100);rCps();notify('🏗️ All buildings x100!');break;
+    case 'unlockupgrades':UPGRADES.forEach(u=>{if(!BU[u.id]){BU[u.id]=true;u.eff();}});rCps();notify('🔬 All upgrades!');break;
     case 'autoclick':
-      if (autoClickInterval) {
-        clearInterval(autoClickInterval);
-        autoClickInterval = null;
-        notify('🖱️ Auto click OFF');
-      } else {
-        autoClickInterval = setInterval(() => {
-          candies += clickPower * 1000;
-          totalCandies += clickPower * 1000;
-        }, 100);
-        notify('🖱️ Auto click ON — 1000/sec!');
-      }
-      break;
+      if(ACI){clearInterval(ACI);ACI=null;notify('🖱️ Auto click OFF');}
+      else{ACI=setInterval(()=>{const e=getCPT()*1000;C+=e;TC+=e;},100);notify('🖱️ Auto click ON!');}break;
     case 'goldenspam':
-      if (goldenSpamInterval) {
-        clearInterval(goldenSpamInterval);
-        goldenSpamInterval = null;
-        notify('✨ Golden spam OFF');
-      } else {
-        goldenSpamInterval = setInterval(spawnGolden, 3000);
-        notify('✨ Golden candy spam ON!');
-      }
-      break;
-    case 'maxcps':
-      cps = 9999999;
-      notify('⚡ Max CPS applied!');
-      break;
+      if(GSpI){clearInterval(GSpI);GSpI=null;notify('✨ Golden spam OFF');}
+      else{GSpI=setInterval(spawnGolden,3000);notify('✨ Golden spam ON!');}break;
+    case 'maxcps':CPS=9999999999;notify('⚡ Max CPS!');break;
+    case 'maxclick':CP=999999999;notify('💥 Max click!');break;
+    case 'addsugar':sugar+=100;totalSugar+=100;notify('🍬 +100 Sugar!');break;
+    case 'addspins':spins+=10;notify('🎡 +10 Spins!');break;
+    case 'unlockperm':PERM.forEach(p=>PL[p.id]=p.max);notify('🛍️ All perm upgrades maxed!');break;
+    case 'forcerebirth':TC=getRBReq()+1;doRebirth();break;
     case 'reset':
-      if (confirm('Reset ALL progress? This cannot be undone!')) {
-        localStorage.removeItem('vandrex_candy');
-        localStorage.removeItem('vandrex_admin_unlocked');
-        // Reset all game state
-        candies = 0;
-        totalCandies = 0;
-        clickPower = 1;
-        cpsMultiplier = 1;
-        cps = 0;
-        boughtUpgrades = {};
-        buildings.forEach(b => { b.owned = 0; });
-        buildings.forEach(b => { buildingMultipliers[b.id] = 1; });
-        if (autoClickInterval) { clearInterval(autoClickInterval); autoClickInterval = null; }
-        if (goldenSpamInterval) { clearInterval(goldenSpamInterval); goldenSpamInterval = null; }
-        location.reload();
-      }
-      break;
+      if(confirm('Reset EVERYTHING? Cannot be undone!')){
+        localStorage.removeItem('vandrex_candy');localStorage.removeItem('vandrex_admin_unlocked');location.reload();
+      }break;
   }
-  renderBuildings();
-  renderUpgrades();
+  renderBuildings();renderUpgrades();renderRebirth();renderPerm();updateDisplay();save();
+}
+
+// SAVE/LOAD
+function save(){
+  localStorage.setItem('vandrex_candy',JSON.stringify({
+    C,TC,CP,CM,GB,BU,BM,RB,sugar,totalSugar,spins,spinsUsed,PL,bestC,
+    buildings:BUILDINGS.map(b=>({id:b.id,owned:b.owned}))
+  }));
+}
+
+function load(){
+  try{
+    const raw=localStorage.getItem('vandrex_candy');if(!raw)return;
+    const d=JSON.parse(raw);
+    C=d.C||0;TC=d.TC||0;CP=d.CP||1;CM=d.CM||1;GB=d.GB||false;
+    BU=d.BU||{};BM=d.BM||{};RB=d.RB||0;sugar=d.sugar||0;totalSugar=d.totalSugar||0;
+    spins=d.spins||0;spinsUsed=d.spinsUsed||0;PL=d.PL||{};bestC=d.bestC||0;
+    BUILDINGS.forEach(b=>BM[b.id]=BM[b.id]||1);
+    PERM.forEach(p=>PL[p.id]=PL[p.id]||0);
+    if(d.buildings)d.buildings.forEach(s=>{const b=BUILDINGS.find(x=>x.id===s.id);if(b)b.owned=s.owned||0;});
+    UPGRADES.forEach(u=>{if(BU[u.id])u.eff();});
+    rCps();
+  }catch(e){console.log('Load err',e);}
+}
+
+function gameLoop(){
+  if(CPS>0){const e=CPS/20;C+=e;TC+=e;if(TC>bestC)bestC=TC;}
   updateDisplay();
-  save();
 }
 
-// ============ GAME LOOP ============
-function gameLoop() {
-  if (cps > 0) {
-    const earned = cps / 20;
-    candies += earned;
-    totalCandies += earned;
-  }
-  updateDisplay();
-}
-
-// ============ CHEAT LISTENER ============
-function checkCheats() {
-  const cheats = [
-    'maxcandies', 'unlockbuildings', 'unlockupgrades',
-    'autoclick', 'goldenspam', 'maxcps', 'reset'
-  ];
-  cheats.forEach(key => {
-    const val = localStorage.getItem('vandrex_candy_cheat_' + key);
-    if (val === 'true') {
-      localStorage.removeItem('vandrex_candy_cheat_' + key);
-      cheat(key);
-    }
-  });
-}
-
-// ============ INIT ============
-load();
-renderBuildings();
-renderUpgrades();
-updateDisplay();
-showAdminIfNeeded();
-startGoldenTimer();
-
-setInterval(gameLoop, 50);
-setInterval(save, 30000);
-setInterval(() => { renderBuildings(); renderUpgrades(); }, 500);
-setInterval(checkCheats, 500);
+load();renderBuildings();renderUpgrades();renderPerm();updateDisplay();drawWheel();showAdminIfNeeded();startGoldenTimer();
+setInterval(gameLoop,50);
+setInterval(save,15000);
+setInterval(()=>{renderBuildings();renderUpgrades();},500);
+setInterval(()=>{const rb=document.getElementById('rebirth-btn');if(rb)rb.disabled=TC<getRBReq();},2000);
 </script>
 </body>
 </html>
