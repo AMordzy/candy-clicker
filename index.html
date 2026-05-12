@@ -6,7 +6,7 @@
 <title>Vandrex Candy Clicker</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap');
-  :root{--bg:#0a0a0f;--panel:#12121a;--border:#2a2a3a;--accent:#ff6b35;--accent2:#ffcc00;--text:#e0e0f0;--muted:#666680;--success:#00ff88;--candy:#ff4488;--rebirth:#cc44ff;--sugar:#ff88ff;}
+  :root{--bg:#0d0a1a;--panel:#1a1530;--border:#3a2a5a;--accent:#ff69b4;--accent2:#aaddff;--text:#f0f0ff;--muted:#8888aa;--success:#88ffcc;--candy:#ff9fd4;--rebirth:#b088ff;--sugar:#ffd6f0;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
   #topbar{background:var(--panel);border-bottom:2px solid var(--accent);padding:6px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:6px;}
@@ -463,8 +463,9 @@ function doRebirth(){
   setTimeout(()=>{
     o.style.display='none';
     RB++;sugar+=rew;totalSugar+=rew;spins++;spins+=(PL.p6||0);
-    const boost=bestC*(0.1*(PL.p1||0));
-    C=boost;TC=0;CP=1;CM=1;BU={};
+    C=0;TC=0;CP=1;CM=1;BU={};
+
+
     BUILDINGS.forEach(b=>{b.owned=0;BM[b.id]=1;});
     if(ACI){clearInterval(ACI);ACI=null;}
     if(GSpI){clearInterval(GSpI);GSpI=null;}
