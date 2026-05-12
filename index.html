@@ -651,13 +651,10 @@ function cheat(t){
     case 'forcerebirth':TC=getRBReq()+1;doRebirth();break;
     case 'reset':
       if(confirm('Reset EVERYTHING? Cannot be undone!')){
-        // Stop all intervals first so save cant run
         for(let i=1;i<99999;i++){clearInterval(i);clearTimeout(i);}
-        // Wipe storage completely
         localStorage.clear();
         sessionStorage.clear();
-        // Hard reload with cache bust
-        location.href=location.href.split('?')[0]+'?reset='+Date.now();
+        location.replace(location.href.split('?')[0]+'?nocache='+Date.now());
       }break;
   }
   renderBuildings();renderUpgrades();renderRebirth();renderPerm();updateDisplay();save();
@@ -673,6 +670,7 @@ function save(){
 
 function load(){
   try{
+    if(location.search.includes('nocache')){localStorage.clear();return;}
     const raw=localStorage.getItem('vandrex_candy');if(!raw)return;
     const d=JSON.parse(raw);
     C=d.C||0;TC=d.TC||0;CP=d.CP||1;CM=d.CM||1;GB=d.GB||false;
